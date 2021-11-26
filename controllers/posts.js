@@ -3,6 +3,7 @@ import PostMessage from '../models/postMessage.js'
 
 export const getPosts = async (req, res)=> {
     try {
+        res.header("Access-Control-Allow-Origin", "*");
         const postMessages = await PostMessage.find();
         console.log(postMessages);
         res.status(200).json(postMessages);
@@ -15,6 +16,7 @@ export const createPost = async (req, res)=> {
     const newPost = new PostMessage(post);
 
     try {
+        res.header("Access-Control-Allow-Origin", "*");
         await newPost.save();
 
         res.status(201).json(newPost);
@@ -23,6 +25,7 @@ export const createPost = async (req, res)=> {
     }
 }
 export const updatePost = async (req, res) =>{
+    res.header("Access-Control-Allow-Origin", "*");
     const { id: _id } =req.params;
     const post = req.body;
     if(!mongoose.Types.ObjectId.isValid(_id)) return res.status(404).send('No post with that id');
@@ -33,6 +36,7 @@ export const updatePost = async (req, res) =>{
 }
 
 export const deletePost = async (req, res) =>{
+    res.header("Access-Control-Allow-Origin", "*");
     const { id } =req.params;
     if(!mongoose.Types.ObjectId.isValid(id)) return res.status(404).send('No post with that id');
 
@@ -42,6 +46,7 @@ export const deletePost = async (req, res) =>{
 
 }
 export const likePost = async (req, res) => {
+    res.header("Access-Control-Allow-Origin", "*");
     const { id } = req.params;
     if(!mongoose.Types.ObjectId.isValid(id)) return res.status(404).send('No post with that id');
     const post = await PostMessage.findById(id);
