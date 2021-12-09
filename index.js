@@ -16,7 +16,11 @@ app.use('/posts', postRoutes);
 app.use('/user', userRouter);
 
 app.get('/', (req, res) => {
-    res.send('APP IS RUNNING');
+    try {
+        res.send('APP IS RUNNING');
+    } catch (error) {
+        return error;
+    }
 });
 
 const CONNECTION_URL = 'mongodb+srv://dninov:criminal1@cluster0.ojfzc.mongodb.net/myFirstDatabase?retryWrites=true&w=majority';
