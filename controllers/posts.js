@@ -3,10 +3,8 @@ import PostMessage from '../models/postMessage.js';
 
 export const getPost = async (req, res) => {
     const { id } = req.params;
-
     try {
         const post = await PostMessage.findById(id);
-
         res.status(200).json(post);
     } catch (error) {
         res.status(404).json({ message: error.message });
@@ -30,16 +28,36 @@ export const getPosts = async (req, res) => {
 };
 
 export const getPostsBySearch = async (req, res) => {
-    console.log('SEARCHING POSTS');
+    console.log('SEARCH POSTS');
 
-    const { searchQuery, tags } = req.query;
-
+    const { page, searchQuery, tags } = req.query;
+    console.log(page, searchQuery, tags);
+    let total = 0;
+    const LIMIT = 8;
+    const startIndex = (Number(page) - 1) * LIMIT;
+    let posts = [];
     try {
         const title = new RegExp(searchQuery, 'i');
-
-        const posts = await PostMessage.find({ $or: [{ title }, { tags: { $in: tags.split(',') } }] });
-
-        res.json({ data: posts });
+        if (searchQuery !== 'none' && tags.length === 0) {
+            // posts = await PostMessage.find({ $or: [{ title }, { tags: { $in: tags.split(',') } }] });
+            const allPosts = await PostMessage.find({ title: title });
+            total = allPosts.length;
+            posts = await PostMessage.find({ title: title }).sort({ _id: -1 }).limit(LIMIT).skip(startIndex);
+        }
+        if (searchQuery === 'none' && tags.length > 0) {
+            const allPosts = await PostMessage.find({ tags: { $in: tags.split(',') } });
+            total = allPosts.length;
+            posts = await PostMessage.find({ tags: { $in: tags.split(',') } }).sort({ _id: -1 }).limit(LIMIT).skip(startIndex);
+        }
+        if (searchQuery !== 'none' && tags.length > 0) {
+            console.log('BOTH');
+            const allPosts = await PostMessage.find({ title: title, tags: { $in: tags.split(',') } });
+            console.log(allPosts.length);
+            total = allPosts.length;
+            posts = await PostMessage.find({ title: title, tags: { $in: tags.split(',') } }).sort({ _id: -1 }).limit(LIMIT).skip(startIndex);
+        }
+        console.log(posts.length);
+        res.status(200).json({ data: posts, currentPage: Number(page), NumberOfPages: Math.ceil(total / LIMIT) });
     } catch (error) {
         res.status(404).json({ message: error.message });
     }
@@ -51,7 +69,6 @@ export const createPost = async (req, res) => {
 
     try {
         await newPost.save();
-
         res.status(201).json(newPost);
     } catch (error) {
         res.status(409).json({ message: error.message });
@@ -96,5 +113,25 @@ export const likePost = async (req, res) => {
 
     const updatedPost = await PostMessage.findByIdAndUpdate(id, post, { new: true });
 
+    res.json(updatedPost);
+};
+
+export const deletePosts = async (req, res) => {
+    console.log('DELETING ALL POSTS');
+    const id = req.params;
+    if (!mongoose.Types.ObjectId.isValid(id.id)) return res.status(404).send('No user with that id');
+
+    await PostMessage.deleteMany({ creator: id.id });
+
+    res.json({ message: 'Posts deleted successfully' });
+};
+export const commentPost = async (req, res) => {
+    console.log('COMMENT POSTS');
+    const { id } = req.params;
+    const { value } = req.body;
+
+    const post = await PostMessage.findById(id);
+    post.comments.push(value);
+    const updatedPost = await PostMessage.findByIdAndUpdate(id, post, { new: true });
     res.json(updatedPost);
 };

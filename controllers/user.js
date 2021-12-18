@@ -1,5 +1,6 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import mongoose from 'mongoose';
 
 import User from '../models/user.js';
 
@@ -42,4 +43,27 @@ export const signup = async (req, res) => {
     } catch (error) {
         res.status(500).json({ message: 'Somwthing went wrong' });
     }
+};
+
+export const update = async (req, res) => {
+    const { id: _id } = req.params;
+    const user = req.body;
+    if (!mongoose.Types.ObjectId.isValid(_id)) return res.status(404).send('No user with that id');
+    console.log({ ...user });
+    const updatedUser = await User.findByIdAndUpdate(_id, { avatar: user.avatar, towns: user.towns, telephone: user.telephone, email: user.email, name: `${user.firstName} ${user.lastName}`, _id }, { new: true });
+
+    const token = jwt.sign({ email: updatedUser.email, id: updatedUser._id }, 'test', { expiresIn: '1h' });
+    console.log(updatedUser);
+
+    res.status(200).json({ result: updatedUser, token });
+};
+
+export const deleteUser = async (req, res) => {
+    console.log('DELETE');
+    const { id } = req.params;
+    if (!mongoose.Types.ObjectId.isValid(id)) return res.status(404).send('No user with that id');
+
+    await User.findByIdAndRemove(id);
+
+    res.json({ message: 'User deleted successfully' });
 };
