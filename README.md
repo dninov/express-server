@@ -9,10 +9,6 @@ Backend for react-app
   - Posts - commentPost, getPost, getPostsBySearch, getPosts, createPost, updatePost, deletePost, likePost, deletePosts
   - Users - signin, signup, update, deleteUser
 
-- **Clinet**
-  - Browse the catalogue.
-  - See post details.
-
 ## Tools
 - [Mongoose](https://www.npmjs.com/package/mongoose)
 - [Express](https://www.npmjs.com/package/express)
