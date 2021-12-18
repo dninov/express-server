@@ -5,10 +5,9 @@
 Backend for react-app
 ## Features
 
-- **User**
-  - Builds up profile details
-  - Create and update Posts. Like or dislike posts. Comment posts.
-  - Build and edit profile. Delete profile and all posts created by the user.
+- **Controllers**
+  - Posts - commentPost, getPost, getPostsBySearch, getPosts, createPost, updatePost, deletePost, likePost, deletePosts
+  - Users - signin, signup, update, deleteUser
 
 - **Clinet**
   - Browse the catalogue.
@@ -18,5 +17,6 @@ Backend for react-app
 - [Mongoose](https://www.npmjs.com/package/mongoose)
 - [Express](https://www.npmjs.com/package/express)
 - [MongoDB](https://www.npmjs.com/package/mongodb)
+- [Json Web Token](https://www.npmjs.com/package/jsonwebtoken)
 
 
